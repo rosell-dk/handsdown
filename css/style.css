@@ -1,0 +1,46 @@
+body {
+  background-color: #66aa88;
+}
+
+
+menu {
+  margin: 0;
+  padding: 0;
+}
+menu ul {
+  display: inline-block;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+menu li {
+  display: inline-block;
+  margin: 0;
+  vertical-align: top;
+}
+menu li a {
+  padding: 4px 20px;
+  display: block;
+  color: black;
+  text-decoration: none;
+  border: 1px solid black;
+}
+menu li a:hover {
+  background-color: #fff;
+}
+
+menu li ul {
+  position: absolute;
+  z-index: 999;
+}
+menu li li {
+  display: none;
+}
+menu li:hover li {
+  display: block;
+}
+menu li li a {
+  border: 0px solid gold;
+}
+
+
