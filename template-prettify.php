@@ -36,6 +36,55 @@ echo $title;
 ?></title>
   <link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
 
+  <style>
+/* Pretty printing styles. Used with prettify.js. */
+/* Other themes available here: https://rawgit.com/google/code-prettify/master/styles/index.html */
+
+/* SPAN elements with the classes below are added by prettyprint. */
+.pln { color: #000 }  /* plain text */
+
+@media screen {
+  .str { color: #080 }  /* string content */
+  .kwd { color: #008 }  /* a keyword */
+  .com { color: #800 }  /* a comment */
+  .typ { color: #606 }  /* a type name */
+  .lit { color: #066 }  /* a literal value */
+  /* punctuation, lisp open bracket, lisp close bracket */
+  .pun, .opn, .clo { color: #660 }
+  .tag { color: #008 }  /* a markup tag name */
+  .atn { color: #606 }  /* a markup attribute name */
+  .atv { color: #080 }  /* a markup attribute value */
+  .dec, .var { color: #606 }  /* a declaration; a variable name */
+  .fun { color: red }  /* a function name */
+}
+
+/* Use higher contrast and text-weight for printable form. */
+@media print, projection {
+  .str { color: #060 }
+  .kwd { color: #006; font-weight: bold }
+  .com { color: #600; font-style: italic }
+  .typ { color: #404; font-weight: bold }
+  .lit { color: #044 }
+  .pun, .opn, .clo { color: #440 }
+  .tag { color: #006; font-weight: bold }
+  .atn { color: #404 }
+  .atv { color: #060 }
+}
+
+pre.prettyprint { padding: 10px 15px; border: 1px solid #888; background-color: #ddd; display: inline-block; }
+
+  </style>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/prettify/r224/prettify.js" type="text/javascript"></script>
+  <script>
+/* Init script */
+document.addEventListener("DOMContentLoaded", function() {
+  var i=0, preTags = document.getElementsByTagName('pre');
+  for (; preTags[i]; i++) {
+    preTags[i].className = 'prettyprint';
+  }
+  prettyPrint();
+});
+  </script>
 </head>
 <body>
 <?php
