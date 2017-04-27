@@ -3,43 +3,43 @@ body {
 }
 
 
-menu {
+nav {
   margin: 0;
   padding: 0;
 }
-menu ul {
+nav ul {
   display: inline-block;
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
-menu li {
+nav li {
   display: inline-block;
   margin: 0;
   vertical-align: top;
 }
-menu li a {
+nav li a {
   padding: 4px 20px;
   display: block;
   color: black;
   text-decoration: none;
   border: 1px solid black;
 }
-menu li a:hover {
+nav li a:hover {
   background-color: #fff;
 }
 
-menu li ul {
+nav li ul {
   position: absolute;
   z-index: 999;
 }
-menu li li {
+nav li li {
   display: none;
 }
-menu li:hover li {
+nav li:hover li {
   display: block;
 }
-menu li li a {
+nav li li a {
   border: 0px solid gold;
 }
 

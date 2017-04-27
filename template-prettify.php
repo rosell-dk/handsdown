@@ -89,10 +89,10 @@ document.addEventListener("DOMContentLoaded", function() {
 <body>
 <?php
 // Insert menu
-$menu_md = file_get_contents('menu.md');
-echo '<menu>';
+$menu_md = file_get_contents('nav.md');
+echo '<nav>';
 echo $Parsedown->text($menu_md);
-echo '</menu>';
+echo '</nav>';
 ?>
 <?php
 echo $Parsedown->text($page_md);

@@ -1,15 +1,23 @@
 <?php
+$md_path = 'pages/';
+
 $start_time = microtime(true);
 
 $page = $_GET['page'];
 if ($page == '') {
   $page = 'index';
 }
-$page_filename_no_ext = 'pages/' . $page;
+$page_filename_no_ext = $md_path . $page;
+
 if (is_dir($page_filename_no_ext)) {
   $page_filename_no_ext .= '/index';
 }
 //echo $page_filename;
+
+if (!is_file($page_filename_no_ext . '.md')) {
+  header("HTTP/1.0 404 Not Found");
+  $page_filename_no_ext = $md_path . '404';
+}
 $page_md = file_get_contents($page_filename_no_ext . '.md');
 
 include('lib/Parsedown.php');
@@ -40,10 +48,10 @@ echo $title;
 <body>
 <?php
 // Insert menu
-$menu_md = file_get_contents('menu.md');
-echo '<menu>';
+$menu_md = file_get_contents('nav.md');
+echo '<nav>';
 echo $Parsedown->text($menu_md);
-echo '</menu>';
+echo '</nav>';
 ?>
 <?php
 echo $Parsedown->text($page_md);
