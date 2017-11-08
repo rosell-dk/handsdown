@@ -66,7 +66,6 @@ if (strncmp($page_md, "+++", 3) === 0) {
 
 // Substitute template (mustache-like syntax)
 // ------------------------------------------
-
 echo preg_replace_callback('/{{((?:[^}]|}[^}])+)}}/', function($matches) {
   global $Parsedown;
   global $pagevars;
@@ -86,6 +85,7 @@ echo preg_replace_callback('/{{((?:[^}]|}[^}])+)}}/', function($matches) {
       global $page_md;
       return $Parsedown->text($page_md);
   }
+/*
   if (strncmp($tag, "block:", 6) === 0) {
     $block_name = trim(substr($tag, 6));
     $block_filename = 'blocks/' . $block_name . '.md';
@@ -94,14 +94,22 @@ echo preg_replace_callback('/{{((?:[^}]|}[^}])+)}}/', function($matches) {
     }
     $block_md = file_get_contents($block_filename);
     return $Parsedown->text($block_md);
-  }
+  }*/
 
   if (isset($pagevars[$tag])) {
     return $pagevars[$tag];
   }
 
+  if (is_file('shortcodes/' . $tag . '.php')) {
+    include 'shortcodes/' . $tag . '.php';
+  }
+
+  if (is_file('shortcodes/' . $tag . '.md')) {
+    $block_md = file_get_contents('shortcodes/' . $tag . '.md');
+    return $Parsedown->text($block_md);
+  }
   
-  return $tag . 'a';
+  return '';
 }, $template_contents);
 
 

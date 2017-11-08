@@ -13,8 +13,10 @@ Handsdown is a little fast and easy CMS without database. Content is written wit
 You simply write html an insert placeholders. Currently, the following placeholders are available:
 
 * {{ main }}: Inserts the main content (the page). The page is determined from the URL. If you visit "/about", the engine will look for a markdown file at /pages/about.md
-* {{ block:xxx }}: Inserts a block. The engine will look for a markdown file at /blocks/xxx.md
-* {{ xxx }}: Inserts a variable defined in the preamble of the page
+* {{ xxx }}: Either insert a block, a shortcode or a variable defined in the preamble of the page (whichever exists).
+  * The engine will look for blocks at /blocks/xxx.md
+  * The engine will look for shortcodes at /shortcodes/xxx.php
+  * The engine will look for page variables in the preamble of the page (see below)
 
 ### Preamble syntax:
 Here is an example of a preamble:
@@ -25,6 +27,10 @@ background = "slow-rabbit.jpg"
 +++
 
 To insert the title taken from the preamble above, you simply put {{ title }} into your template
+
+
+### Shortcodes
+Shortcodes can be used to invoke php sub
 
 
 ### Benefits compared to using a CMS such as Wordpress
