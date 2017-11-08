@@ -10,17 +10,17 @@ RewriteEngine On
 # ---- Handsdown ----
 
 # Route certain pages to the "prettify" template.
-RewriteRule ^(codeblocks)$ template-prettify.php?page=$1 [NC,L,QSA]
+# RewriteRule ^(codeblocks)$ template-prettify.php?page=$1 [NC,L,QSA]
 
 
 
-# Pass all requests not referring directly to files in the filesystem to the default template
+# Pass all requests not referring directly to files in the filesystem to the engine
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ template.php?page=$1 [NC,L,QSA]
+RewriteRule ^(.*)$ handsdown-engine.php?page=$1 [NC,L,QSA]
 
-# Pass directories to template as well
+# Pass directories to the engine as well
 # RewriteCond %{REQUEST_FILENAME} -d
-# RewriteRule ^(.*)$ template.php?page=index [NC,L,QSA]
+# RewriteRule ^(.*)$ handsdown-engine.php?page=index [NC,L,QSA]
 
 
 </IfModule>
