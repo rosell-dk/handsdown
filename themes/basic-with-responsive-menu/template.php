@@ -6,12 +6,12 @@
   <meta name="description" content="{{ metatags.description }}">
   <meta name="keywords" content="{{ metatags.keywords }}">
   <meta name="author" content="{{ author }}"/>
-  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="{{ root-url }}favicon.ico" type="image/x-icon">
+  <link rel="icon" href="{{ root-url }}favicon.ico" type="image/x-icon">
   <meta name="generator" content="handsdown" />
 
   <title>{{ title }}</title>
-  <link rel="stylesheet" href="/themes/{{ theme-name }}/style.css" type="text/css" media="all" />
+  <link rel="stylesheet" href="{{ theme-url }}/style.css" type="text/css" media="all" />
 </head>
 <body>
   <div id="menu">
@@ -32,8 +32,11 @@
 
   <?php 
   // You get to the page options like this:
-  // echo $page_options['metatags.keywords'];
+  // $page_options['metatags.keywords'];
+  // Use it when you need to do some logic based on page options.
+  // When no logic is needed, use the placeholders instead (the mustache-syntax) - it is more readable
  ?>
+
 
 </body>
 </html>

@@ -1,11 +1,17 @@
 <?php
 
+$time_start = microtime(true);
 
 include 'config.php';
 
+// Default paths
+$themes_path = 'themes';
+$pages_path = 'pages';
+$blocks_path = 'blocks';
+$shortcodes_path = 'shortcodes';
 
 
-$start_time = microtime(true);
+
 
 
 
@@ -53,7 +59,7 @@ if (strncmp($page_md, "+++", 3) === 0) {
       $group_prefix = $matches[1] . '.';
     }
     // String assignments
-    if (preg_match('/(\w+)\\s*=\\s*([\'"])(.*)\\2/', $line, $matches)) {
+    if (preg_match('/([\w-]+)\\s*=\\s*([\'"])(.*)\\2/', $line, $matches)) {
       $page_options[$group_prefix . $matches[1]] = $matches[3];
     }
   }
@@ -76,58 +82,86 @@ $template_contents = ob_get_clean();
 
 // Substitute template (mustache-like syntax)
 // ------------------------------------------
-echo preg_replace_callback('/{{((?:[^}]|}[^}])+)}}/', function($matches) {
-  global $Parsedown;
-  global $page_options;
 
-  $tag = trim($matches[1]);
+function mustache_substitude($text) {
+  return preg_replace_callback('/{{((?:[^}]|}[^}])+)}}/', function($matches) {
+    global $Parsedown;
+    global $page_options;
 
-  switch ($tag) {
-/*
-    case 'title':
-      // If first line in md-file is a heading, use that as the title
-      preg_match('/#\s*(.*)/', $page_md, $matches);
-      if (count($matches) == 2) {
-        return $matches[1];
-      }
-      return 'default title';*/
-    case 'main':
-      global $page_md;
-      return $Parsedown->text($page_md);
+    $tag = trim($matches[1]);
 
-    case 'theme-name':
-      global $theme;
-      return $theme;
-  }
-/*
-  if (strncmp($tag, "block:", 6) === 0) {
-    $block_name = trim(substr($tag, 6));
-    $block_filename = 'blocks/' . $block_name . '.md';
-    if (!is_file($block_filename)) {
-      return 'Block not found: ' . $block_filename;
+    switch ($tag) {
+  /*
+      case 'title':
+        // If first line in md-file is a heading, use that as the title
+        preg_match('/#\s*(.*)/', $page_md, $matches);
+        if (count($matches) == 2) {
+          return $matches[1];
+        }
+        return 'default title';*/
+      case 'main':
+        global $page_md;
+        return $Parsedown->text($page_md);
+
+      case 'theme-name':
+        global $theme;
+        return $theme;
+
+      case 'root-url':
+        global $root_url;
+        return $root_url;
+
+      case 'theme-url':
+        global $root_url;
+        global $theme;
+        return $root_url . 'themes/' . $theme . '/';
     }
-    $block_md = file_get_contents($block_filename);
-    return $Parsedown->text($block_md);
-  }*/
+  /*
+    if (strncmp($tag, "block:", 6) === 0) {
+      $block_name = trim(substr($tag, 6));
+      $block_filename = 'blocks/' . $block_name . '.md';
+      if (!is_file($block_filename)) {
+        return 'Block not found: ' . $block_filename;
+      }
+      $block_md = file_get_contents($block_filename);
+      return $Parsedown->text($block_md);
+    }*/
 
-  if (isset($page_options[$tag])) {
-    return $page_options[$tag];
-  }
+    if (isset($page_options[$tag])) {
+      return $page_options[$tag];
+    }
 
-  global $shortcodes_path;
-  if (is_file($shortcodes_path . '/' . $tag . '.php')) {
-    include $shortcodes_path . '/' . $tag . '.php';
-  }
+    global $shortcodes_path;
+    if (is_file($shortcodes_path . '/' . $tag . '.php')) {
+      ob_start();
+      include $shortcodes_path . '/' . $tag . '.php';
+      return ob_get_clean();
+    }
 
-  global $blocks_path;
-  if (is_file($blocks_path . '/' . $tag . '.md')) {
-    $block_md = file_get_contents($blocks_path . '/' . $tag . '.md');
-    return $Parsedown->text($block_md);
-  }
-  
-  return '';
-}, $template_contents);
+    global $blocks_path;
+    if (is_file($blocks_path . '/' . $tag . '.md')) {
+      $block_md = file_get_contents($blocks_path . '/' . $tag . '.md');
+      return $Parsedown->text($block_md);
+    }
+    
+    return '';
+  }, $text);
+}
+
+$template_contents = mustache_substitude($template_contents);
+
+// Do it again, so mustache tags in pages etc are also substituted
+$template_contents = mustache_substitude($template_contents);
+
+// Do it again again, so mustache tags in shortcodes are also substituted
+$template_contents = mustache_substitude($template_contents);
 
 
-//echo $template_contents;
+echo $template_contents;
+
+$time_end = microtime(true);
+
+echo '<!-- Handsdown CMS created this page in: ' . round(($time_end - $time_start) * 1000, 2) . ' ms -->';
+
+
 
