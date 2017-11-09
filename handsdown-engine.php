@@ -3,7 +3,6 @@
 
 include 'config.php';
 
-$md_path = 'pages/';
 
 
 $start_time = microtime(true);
@@ -11,7 +10,7 @@ $start_time = microtime(true);
 
 // Get template
 // ------------
-$template_filename = 'templates/' . $template . '/template.php';
+$template_filename = $themes_path . '/' . $theme . '/template.php';
 
 if (!is_file($template_filename)) {
   echo 'template not found: ' . $template_filename;
@@ -26,7 +25,7 @@ $page = $_GET['page'];
 if ($page == '') {
   $page = 'index';
 }
-$page_filename_no_ext = $md_path . $page;
+$page_filename_no_ext = $pages_path . '/' . $page;
 
 if (is_dir($page_filename_no_ext)) {
   $page_filename_no_ext .= '/index';
@@ -35,7 +34,7 @@ if (is_dir($page_filename_no_ext)) {
 
 if (!is_file($page_filename_no_ext . '.md')) {
   header("HTTP/1.0 404 Not Found");
-  $page_filename_no_ext = $md_path . '404';
+  $page_filename_no_ext = $pages_path . '/404';
 }
 $page_md = file_get_contents($page_filename_no_ext . '.md');
 
@@ -46,20 +45,28 @@ include('lib/Parsedown.php');
 $Parsedown = new Parsedown();
 
 
-// Parse front matter (TOML format, but only strings are supported)
+// Parse front matter (TOML format, but only partly supported)
 // ----------------------------------------------------------------
 $pagevars = array();
 if (strncmp($page_md, "+++", 3) === 0) {
 
   $endpos = strpos($page_md, '+++', 3);
   $frontmatter = trim(substr($page_md, 3, $endpos - 3));
-
   $page_md = substr($page_md, $endpos + 3);
 
-  preg_replace_callback('/(\w+)\\s*=\\s*([\'"])(.*)\\2/', function($matches) {
-    global $pagevars;
-    $pagevars[$matches[1]] = $matches[3];
-  }, $frontmatter);
+  $lines = preg_split("/\\r\\n|\\r|\\n/", $frontmatter);
+
+  $group_prefix = '';
+  foreach ($lines as $line) {
+    // Grouping
+    if (preg_match('/\[(.*)\]/', $line, $matches)) {
+      $group_prefix = $matches[1] . '.';
+    }
+    // String assignments
+    if (preg_match('/(\w+)\\s*=\\s*([\'"])(.*)\\2/', $line, $matches)) {
+      $pagevars[$group_prefix . $matches[1]] = $matches[3];
+    }
+  }
 }
 
 
@@ -84,6 +91,10 @@ echo preg_replace_callback('/{{((?:[^}]|}[^}])+)}}/', function($matches) {
     case 'main':
       global $page_md;
       return $Parsedown->text($page_md);
+
+    case 'theme-name':
+      global $theme;
+      return $theme;
   }
 /*
   if (strncmp($tag, "block:", 6) === 0) {
@@ -100,12 +111,14 @@ echo preg_replace_callback('/{{((?:[^}]|}[^}])+)}}/', function($matches) {
     return $pagevars[$tag];
   }
 
-  if (is_file('shortcodes/' . $tag . '.php')) {
-    include 'shortcodes/' . $tag . '.php';
+  global $shortcodes_path;
+  if (is_file($shortcodes_path . '/' . $tag . '.php')) {
+    include $shortcodes_path . '/' . $tag . '.php';
   }
 
-  if (is_file('shortcodes/' . $tag . '.md')) {
-    $block_md = file_get_contents('shortcodes/' . $tag . '.md');
+  global $blocks_path;
+  if (is_file($blocks_path . '/' . $tag . '.md')) {
+    $block_md = file_get_contents($blocks_path . '/' . $tag . '.md');
     return $Parsedown->text($block_md);
   }
   
