@@ -30,6 +30,10 @@
 
   {{ main }}
 
+  <?php 
+  // You get to the page options like this:
+  // echo $page_options['metatags.keywords'];
+ ?>
 
 </body>
 </html>

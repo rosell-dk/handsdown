@@ -8,16 +8,6 @@ include 'config.php';
 $start_time = microtime(true);
 
 
-// Get template
-// ------------
-$template_filename = $themes_path . '/' . $theme . '/template.php';
-
-if (!is_file($template_filename)) {
-  echo 'template not found: ' . $template_filename;
-  exit;
-}
-$template_contents = file_get_contents($template_filename);
-
 
 // Get page md
 // ------------
@@ -47,7 +37,7 @@ $Parsedown = new Parsedown();
 
 // Parse front matter (TOML format, but only partly supported)
 // ----------------------------------------------------------------
-$pagevars = array();
+$page_options = array();
 if (strncmp($page_md, "+++", 3) === 0) {
 
   $endpos = strpos($page_md, '+++', 3);
@@ -64,10 +54,23 @@ if (strncmp($page_md, "+++", 3) === 0) {
     }
     // String assignments
     if (preg_match('/(\w+)\\s*=\\s*([\'"])(.*)\\2/', $line, $matches)) {
-      $pagevars[$group_prefix . $matches[1]] = $matches[3];
+      $page_options[$group_prefix . $matches[1]] = $matches[3];
     }
   }
 }
+
+
+// Get template
+// ------------
+$template_filename = $themes_path . '/' . $theme . '/template.php';
+
+if (!is_file($template_filename)) {
+  echo 'template not found: ' . $template_filename;
+  exit;
+}
+ob_start();
+include $template_filename;
+$template_contents = ob_get_clean();
 
 
 
@@ -75,7 +78,7 @@ if (strncmp($page_md, "+++", 3) === 0) {
 // ------------------------------------------
 echo preg_replace_callback('/{{((?:[^}]|}[^}])+)}}/', function($matches) {
   global $Parsedown;
-  global $pagevars;
+  global $page_options;
 
   $tag = trim($matches[1]);
 
@@ -107,8 +110,8 @@ echo preg_replace_callback('/{{((?:[^}]|}[^}])+)}}/', function($matches) {
     return $Parsedown->text($block_md);
   }*/
 
-  if (isset($pagevars[$tag])) {
-    return $pagevars[$tag];
+  if (isset($page_options[$tag])) {
+    return $page_options[$tag];
   }
 
   global $shortcodes_path;
