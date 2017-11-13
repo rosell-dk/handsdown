@@ -1,0 +1,54 @@
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+#Action markdown /markdown/handler.php
+#AddHandler markdown .md
+
+# ---- Handsdown ----
+
+# Pass all requests not referring directly to files in the filesystem to the engine
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ handsdown-engine.php?page=$1 [NC,L,QSA]
+
+# Pass directories to the engine as well
+# RewriteCond %{REQUEST_FILENAME} -d
+# RewriteRule ^(.*)$ handsdown-engine.php?page=index [NC,L,QSA]
+</IfModule>
+
+
+
+<IfModule mod_rewrite.c>
+  
+  # ---- webp-on-demand ----
+
+  # IN ORDER FOR THIS TO WORK, PLEASE COPY webp-convert files INTO /lib/webp-convert
+  # YOU CAN GET IT HERE: https://github.com/rosell-dk/webp-convert
+  # THEN RENAME .htaccess to .htaccess.old
+  # AND THEN RENAME THIS FILE TO .htaccess
+
+  RewriteEngine On
+  RewriteBase /
+
+  RewriteCond %{HTTP_ACCEPT} image/webp
+  RewriteCond %{QUERY_STRING} (^reconvert.*)|(^debug.*) [OR]
+  RewriteCond %{DOCUMENT_ROOT}/images/webp-cache/$1.$2.webp !-f
+  RewriteCond %{QUERY_STRING} (.*)
+  RewriteRule ^(.*)\.(jpe?g|png)$ lib/webp-convert/webp-convert.php?source=$1.$2&quality=80&destination-root=images/webp-cache&preferred-converters=imagick,cwebp&serve-image=yes&%1 [NC,T=image/webp,E=accept:1]
+
+  RewriteCond %{HTTP_ACCEPT} image/webp
+  RewriteCond %{QUERY_STRING} !((^reconvert.*)|(^debug.*))
+  RewriteCond %{DOCUMENT_ROOT}/images/webp-cache/$1.$2.webp -f
+  RewriteRule ^(.*)\.(jpe?g|png)$ /images/webp-cache/$1.$2.webp [NC,T=image/webp,E=accept:1,QSD]
+</IfModule>
+
+# Making CDN caching possible.
+# The effect is that the CDN will cache both the webp image and the jpeg/png image
+# and return the proper image to the proper clients (for this to work, make sure to
+# set up CDN to forward the "Accept" header)
+<IfModule mod_headers.c>
+    Header append Vary Accept env=REDIRECT_accept
+</IfModule>
+
+AddType image/webp .webp
+

@@ -28,11 +28,27 @@ if (is_dir($page_filename_no_ext)) {
 }
 //echo $page_filename;
 
-if (!is_file($page_filename_no_ext . '.md')) {
+if (is_file($page_filename_no_ext . '.md')) {
+//  $page_md = file_get_contents($page_filename_no_ext . '.md');
+  ob_start();
+  include $page_filename_no_ext . '.md';
+  $page_md = ob_get_clean();
+}
+else if (is_file($page_filename_no_ext . '.php')) {
+  ob_start();
+  include $page_filename_no_ext . '.php';
+  $page_md = ob_get_clean();
+}
+else {
   header("HTTP/1.0 404 Not Found");
   $page_filename_no_ext = $pages_path . '/404';
 }
-$page_md = file_get_contents($page_filename_no_ext . '.md');
+
+/*
+ob_start();
+include $template_filename;
+$template_contents = ob_get_clean();
+*/
 
 
 // Prepare Parsedown

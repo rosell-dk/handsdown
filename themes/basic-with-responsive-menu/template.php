@@ -27,7 +27,6 @@
     <input id="drop" type="checkbox">
     <nav id="mainnav">{{ nav }}</nav>
   </div>  
-
   {{ main }}
 
   <?php 
