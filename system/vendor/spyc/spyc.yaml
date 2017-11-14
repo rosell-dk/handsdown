@@ -11,6 +11,19 @@
 
 ---
 
+menu:
+  - Blog: /blog
+  - Corporate: http://corporate-site.com
+  - About us: /about
+    - Mission: /about/mission
+    - Contact us: /about/contact
+
+metatags:
+  description: Hands down - the notoriously unnoticed CMS
+  keywords: CMS, file-oriented, PHP, templates
+
+
+
 # Mappings - with proper types
 String: Anyone's name, really.
 Int: 13

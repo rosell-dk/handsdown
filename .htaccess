@@ -16,11 +16,11 @@ RewriteEngine On
 
 # Pass all requests not referring directly to files in the filesystem to the engine
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ handsdown-engine.php?page=$1 [NC,L,QSA]
+RewriteRule ^(.*)$ system/handsdown-engine.php?page=$1 [NC,L,QSA]
 
 # Pass directories to the engine as well
 # RewriteCond %{REQUEST_FILENAME} -d
-# RewriteRule ^(.*)$ handsdown-engine.php?page=index [NC,L,QSA]
+# RewriteRule ^(.*)$ system/handsdown-engine.php?page=index [NC,L,QSA]
 
 
 </IfModule>

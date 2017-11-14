@@ -1,38 +1,35 @@
 <?php
 
+require_once "vendor/spyc/Spyc.php";
+
+$root_url = '/';
+
 $time_start = microtime(true);
 
-include 'config.php';
+# include 'config.php';
 
-// Default paths
-$themes_path = 'themes';
-$pages_path = 'pages';
-$blocks_path = 'blocks';
-$shortcodes_path = 'shortcodes';
-
-// This will be used to hold content before wrapping a template around it
-$content = '';
 
 // Prepare Parsedown
 // ------------------
-include('lib/Parsedown.php');
+require_once 'vendor/parsedown/Parsedown.php';
 $Parsedown = new Parsedown();
 
 
 // Here options from frontmatter are stored
 // Note that same array is used for all frontmatters.
 // If you use same key in a block as in a page, it will override
-$frontmatter_options = array();
+$frontmatter_options = Spyc::YAMLLoad('../config.yaml');
 
+$theme = $frontmatter_options['theme'];
 
 /** Parse front matter 
- *  (TOML format, but only partly supported)
+ *  
  */
 function parseFrontmatter(&$text_md) { 
   global $frontmatter_options;
  
   if (strncmp($text_md, "+++", 3) === 0) {
-
+    // TOML format, but only partly supported
     $endpos = strpos($text_md, '+++', 3);
     $frontmatter = trim(substr($text_md, 3, $endpos - 3));
     $text_md = substr($text_md, $endpos + 3);
@@ -51,10 +48,21 @@ function parseFrontmatter(&$text_md) {
       }
     }
   }
+  if (strncmp($text_md, "---", 3) === 0) {
+    $endpos = strpos($text_md, '---', 3);
+    $frontmatter = trim(substr($text_md, 3, $endpos - 3));
+    $text_md = substr($text_md, $endpos + 3);
+
+    $array = Spyc::YAMLLoadString($frontmatter);
+
+    foreach ($array as $index => $item) {
+      $frontmatter_options[$index] = $item;
+    }
+  }
 }
 
 
-function mustache_substitude($text, $content_variable) {
+function mustache_substitute($text, $content_variable) {
   
   return preg_replace_callback('/{{((?:[^}]|}[^}])+)}}/', function($matches) use ($content_variable) {
     global $Parsedown;
@@ -101,8 +109,6 @@ function mustache_substitude($text, $content_variable) {
       return ob_get_clean();
     }*/
 
-//    global $blocks_path;
-
     $block_html = find_and_parse_md_or_php_file('blocks', $tag, $content_variable);
     if ($block_html !== FALSE) {
       return $block_html;
@@ -127,7 +133,7 @@ function mustache_substitude($text, $content_variable) {
  */
 function find_and_parse_md_or_php_file($type, $slug, $content_variable = '') {
 
-  $filename_without_extension = $type . '/' . $slug;
+  $filename_without_extension = '../' . $type . '/' . $slug;
   if (is_file($filename_without_extension . '.md')) {
     $filename = $filename_without_extension . '.md';
   }
@@ -145,7 +151,7 @@ function find_and_parse_md_or_php_file($type, $slug, $content_variable = '') {
 
   parseFrontmatter($content);
 
-  $content = mustache_substitude($content, $content_variable);
+  $content = mustache_substitute($content, $content_variable);
 
   if ($type != 'themes') {
 
@@ -173,14 +179,12 @@ function find_and_parse_md_or_php_file($type, $slug, $content_variable = '') {
 }
 
 
-
 // Get page md
 // ------------
 $page = $_GET['page'];
 if ($page == '') {
   $page = 'index';
 }
-$page_filename_no_ext = $pages_path . '/' . $page;
 
 if (is_dir('pages/' . $page)) {
   $page .= '/index';
@@ -195,67 +199,6 @@ else {
   echo find_and_parse_md_or_php_file('pages', '404', '');
 }
 
-//echo $page_filename;
-
-/*
-if (is_file($page_filename_no_ext . '.md')) {
-//  $page_md = file_get_contents($page_filename_no_ext . '.md');
-  ob_start();
-  include $page_filename_no_ext . '.md';
-  $page_md = ob_get_clean();
-}
-else if (is_file($page_filename_no_ext . '.php')) {
-  ob_start();
-  include $page_filename_no_ext . '.php';
-  $page_md = ob_get_clean();
-}
-else {
-  header("HTTP/1.0 404 Not Found");
-  $page_filename_no_ext = $pages_path . '/404';
-}*/
-
-//parseFrontmatter($page_md);
-
-
-
-/*
-ob_start();
-include $template_filename;
-$template_contents = ob_get_clean();
-*/
-
-
-/*
-
-// Get template
-// ------------
-$template_filename = $themes_path . '/' . $theme . '/template.php';
-
-if (!is_file($template_filename)) {
-  echo 'template not found: ' . $template_filename;
-  exit;
-}
-ob_start();
-include $template_filename;
-$template_contents = ob_get_clean();
-*/
-
-/** 
- * Substitute mustache tags
- */
-
-
-/*$template_contents = mustache_substitude($template_contents);
-
-// Do it again, so mustache tags in pages etc are also substituted
-// $template_contents = mustache_substitude($template_contents);
-
-// Do it again again, so mustache tags in shortcodes are also substituted
-// $template_contents = mustache_substitude($template_contents);
-
-
-echo $template_contents;
-*/
 
 $time_end = microtime(true);
 
