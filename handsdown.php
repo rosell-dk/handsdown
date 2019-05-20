@@ -1,6 +1,10 @@
 <?php
 
-require_once "vendor/spyc/Spyc.php";
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
+
+
+//require_once "vendor/spyc/Spyc.php";
 
 $root_url = '/';
 
@@ -11,23 +15,23 @@ $time_start = microtime(true);
 
 // Prepare Parsedown
 // ------------------
-require_once 'vendor/parsedown/Parsedown.php';
+//require_once 'vendor/parsedown/Parsedown.php';
 $Parsedown = new Parsedown();
 
 
 // Here options from frontmatter are stored
 // Note that same array is used for all frontmatters.
 // If you use same key in a block as in a page, it will override
-$frontmatter_options = Spyc::YAMLLoad('../config.yaml');
+$frontmatter_options = Spyc::YAMLLoad(__DIR__ . '/handsdown-config.yaml');
 
 $theme = $frontmatter_options['theme'];
 
-/** Parse front matter 
- *  
+/** Parse front matter
+ *
  */
-function parseFrontmatter(&$text_md) { 
+function parseFrontmatter(&$text_md) {
   global $frontmatter_options;
- 
+
   if (strncmp($text_md, "+++", 3) === 0) {
     // TOML format, but only partly supported
     $endpos = strpos($text_md, '+++', 3);
@@ -63,7 +67,7 @@ function parseFrontmatter(&$text_md) {
 
 
 function mustache_substitute($text, $content_variable) {
-  
+
   return preg_replace_callback('/{{((?:[^}]|}[^}])+)}}/', function($matches) use ($content_variable) {
     global $Parsedown;
     global $frontmatter_options;
@@ -113,7 +117,7 @@ function mustache_substitute($text, $content_variable) {
     if ($block_html !== FALSE) {
       return $block_html;
     }
-    
+
     return '';
 //    return 'unknown tag: "' . $tag . '"';
   }, $text);
@@ -133,7 +137,7 @@ function mustache_substitute($text, $content_variable) {
  */
 function find_and_parse_md_or_php_file($type, $slug, $content_variable = '') {
 
-  $filename_without_extension = '../' . $type . '/' . $slug;
+  $filename_without_extension = 'handsdown-content/' . $type . '/' . $slug;
   if (is_file($filename_without_extension . '.md')) {
     $filename = $filename_without_extension . '.md';
   }
@@ -141,7 +145,7 @@ function find_and_parse_md_or_php_file($type, $slug, $content_variable = '') {
     $filename = $filename_without_extension . '.php';
   }
   else {
-//    echo 'not found: ' . $filename_without_extension . '<br><br>';
+    //echo 'not found: ' . $filename_without_extension . '<br><br>';
     return FALSE;
   }
 
@@ -203,6 +207,3 @@ else {
 $time_end = microtime(true);
 
 echo '<!-- Handsdown CMS created this page in: ' . round(($time_end - $time_start) * 1000, 2) . ' ms -->';
-
-
-

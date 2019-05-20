@@ -1,0 +1,57 @@
+{
+  "name": "rosell-dk/handsdown",
+  "description": "Hands down - the notoriously unnoticed CMS",
+  "type": "project",
+  "license": "MIT",
+  "keywords": ["cms", "flat"],
+  "scripts": {
+    "ci": [
+      "@build",
+      "@test",
+      "@phpcs-all",
+      "@composer validate --no-check-all --strict",
+      "@phpstan-global"
+    ],
+    "test": "phpunit --coverage-text",
+    "phpcs": "phpcs --standard=PSR2",
+    "phpcbf": "phpcbf --standard=PSR2",
+    "build": "php build-scripts/build.php",
+    "phpstan": "vendor/bin/phpstan analyse src --level=4",
+    "phpstan-global": "~/.composer/vendor/bin/phpstan analyse src --level=4"
+  },
+  "extra": {
+      "scripts-descriptions": {
+        "ci": "Run tests before CI",
+        "phpcs": "Checks coding styles (PSR2) of file/dir, which you must supply. To check all, supply 'src'",
+        "phpcbf": "Fix coding styles (PSR2) of file/dir, which you must supply. To fix all, supply 'src'",
+        "test": "Launches the preconfigured PHPUnit"
+      }
+  },
+  "autoload": {
+    "psr-4": { "WebPConvert\\": "src/" }
+  },
+  "autoload-dev": {
+    "psr-4": { "WebPConvert\\Tests\\": "tests/" }
+  },
+  "authors": [
+    {
+      "name": "Bjørn Rosell",
+      "homepage": "https://www.bitwise-it.dk/contact",
+      "role": "Project Author"
+    }
+  ],
+  "require": {
+      "php": "^5.6 | ^7.0",
+      "rosell-dk/image-mime-type-guesser": "^0.3",
+      "erusev/parsedown": "^1.7",
+      "mustangostang/spyc": "^0.6"
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^2.11",
+    "phpunit/phpunit": "5.7.27",
+    "squizlabs/php_codesniffer": "3.*"
+  },
+  "config": {
+    "sort-packages": true
+  }
+}

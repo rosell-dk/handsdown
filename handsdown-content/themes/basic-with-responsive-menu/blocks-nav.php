@@ -10,6 +10,4 @@
   </div>
   <input id="drop" type="checkbox">
   <nav id="mainnav">{{ content }}</nav>
-</div>  
-
-
+</div>
